@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artes Plásticas & Agenda 2030 | ODS 14: Vida Submarina</title>
+    <!-- Tailwind CSS para interfaz responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- p5.js para Canvas e interactividad generativa -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <!-- FontAwesome para iconografía -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+        /* Evita el desplazamiento y zoom por defecto en celulares sobre el canvas */
+        #canvas-container canvas {
+            touch-action: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col lg:flex-row overflow-x-hidden">
+
+    <!-- PANEL LATERAL / CONTROLES ARTÍSTICOS Y DIDÁCTICOS -->
+    <aside class="w-full lg:w-96 bg-slate-900 border-r border-slate-800 p-6 flex flex-col justify-between shrink-0 h-auto lg:h-screen overflow-y-auto">
+        <div class="space-y-6">
+            <!-- Encabezado del Proyecto -->
+            <div>
+                <div class="flex items-center space-x-2 text-cyan-400 text-xs font-semibold uppercase tracking-wider mb-1">
+                    <i class="fa-solid fa-water"></i>
+                    <span>Programación para Artistas I</span>
+                </div>
+                <h1 class="text-2xl font-bold text-white tracking-tight">Ecosistema Fluido</h1>
+                <p class="text-xs text-slate-400 mt-1">Agenda 2030 • ODS 14: Vida Submarina</p>
+            </div>
+
+            <hr class="border-slate-800">
+
+            <!-- Selección de Modos de Abstracción Plástica -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">
+                    1. Estado del Ecosistema Marino
+                </label>
+                <div class="grid grid-cols-1 gap-2">
+                    <button onclick="setEcosystemMode('PRISTINE')" id="btn-PRISTINE" class="mode-btn p-3 rounded-lg border border-cyan-500/50 bg-slate-800 text-left transition flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-cyan-400 block">Arrecife Saludable</span>
+                            <span class="text-[10px] text-slate-400">Flujo armónico de partículas y luz HSB</span>
+                        </div>
+                        <i class="fa-solid fa-fish text-cyan-400"></i>
+                    </button>
+                    <button onclick="setEcosystemMode('ACIDIFICATION')" id="btn-ACIDIFICATION" class="mode-btn p-3 rounded-lg border border-slate-700 bg-slate-800/50 hover:bg-slate-800 text-left transition flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-amber-400 block">Acidificación de Océanos</span>
+                            <span class="text-[10px] text-slate-400">Pérdida de croma y corrosión de formas</span>
+                        </div>
+                        <i class="fa-solid fa-temperature-arrow-up text-amber-400"></i>
+                    </button>
+                    <button onclick="setEcosystemMode('PLASTIC')" id="btn-PLASTIC" class="mode-btn p-3 rounded-lg border border-slate-700 bg-slate-800/50 hover:bg-slate-800 text-left transition flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-rose-400 block">Contaminación por Plástico</span>
+                            <span class="text-[10px] text-slate-400">Geometría rígida que frena los vectores</span>
+                        </div>
+                        <i class="fa-solid fa-dumpster text-rose-400"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Parámetros Algorítmicos / Variables de Código -->
+            <div class="space-y-4 bg-slate-950/60 p-4 rounded-xl border border-slate-800">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">2. Parámetros Plásticos</span>
+                    <i class="fa-solid fa-sliders text-xs text-slate-500"></i>
+                </div>
+
+                <!-- Densidad de Campo / N° de Partículas -->
+                <div>
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-slate-400">Densidad (Cant. Partículas)</span>
+                        <span id="val-density" class="text-cyan-400 font-mono">500</span>
+                    </div>
+                    <input type="range" id="slider-density" min="100" max="1200" value="500" class="w-full accent-cyan-500 bg-slate-800 h-1.5 rounded-lg appearance-none cursor-pointer">
+                </div>
+
+                <!-- Magnitud del Vector / Velocidad -->
+                <div>
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-slate-400">Corriente (Magnitud Vectorial)</span>
+                        <span id="val-speed" class="text-cyan-400 font-mono">2.5</span>
+                    </div>
+                    <input type="range" id="slider-speed" min="0.5" max="6.0" step="0.1" value="2.5" class="w-full accent-cyan-500 bg-slate-800 h-1.5 rounded-lg appearance-none cursor-pointer">
+                </div>
+
+                <!-- Escala de Ruido Perlin / Turbulencia -->
+                <div>
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-slate-400">Turbulencia (Noise Scale)</span>
+                        <span id="val-noise" class="text-cyan-400 font-mono">0.008</span>
+                    </div>
+                    <input type="range" id="slider-noise" min="0.001" max="0.03" step="0.001" value="0.008" class="w-full accent-cyan-500 bg-slate-800 h-1.5 rounded-lg appearance-none cursor-pointer">
+                </div>
+
+                <!-- Paleta Cromática Digital -->
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Espacio de Color Digital</label>
+                    <select id="color-mode-select" class="w-full bg-slate-800 border border-slate-700 text-xs rounded-lg p-2 text-slate-200 focus:outline-none focus:border-cyan-500">
+                        <option value="HSB_OCEAN">HSB: Ciano / Ultra-Marino</option>
+                        <option value="HSB_BIOLUM">HSB: Bioluminiscencia Profunda</option>
+                        <option value="RGB_HIGH">RGB: Alto Contraste Térmico</option>
+                    </select>
+                </div>
+
+                <!-- Tipo de interacción con las partículas -->
+                <div>
+                    <label for="interaction-mode" class="block text-xs text-slate-400 mb-1">Interacción con el cursor o toque táctil</label>
+                    <select id="interaction-mode" class="w-full bg-slate-800 border border-slate-700 text-xs rounded-lg p-2 text-slate-200 focus:outline-none focus:border-cyan-500">
+                        <option value="attract">Atraer partículas</option>
+                        <option value="repel">Repeler partículas</option>
+                        <option value="none">Sin interacción</option>
+                    </select>
+                    <p class="text-[10px] text-slate-500 mt-1">Toca o haz clic y arrastra sobre el lienzo para interactuar.</p>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="grid grid-cols-1 gap-2">
+                <button onclick="randomizeArtwork()" class="w-full py-2 px-3 bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold rounded-lg transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Generar composición aleatoria</span>
+                </button>
+                <div class="flex gap-2">
+                    <button onclick="resetCanvasArt()" class="flex-1 py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg border border-slate-700 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Reiniciar Lienzo</span>
+                    </button>
+                    <button onclick="downloadArtwork()" class="flex-1 py-2 px-3 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold rounded-lg transition flex items-center justify-center space-x-2 shadow-lg shadow-cyan-600/30">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Exportar PNG</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pie de créditos -->
+        <div class="mt-6 pt-4 border-t border-slate-800 text-[11px] text-slate-500 flex justify-between items-center">
+            <span>UN Agenda 2030 × Artes Plásticas</span>
+            <span class="font-mono text-slate-400">p5.js • Canvas2D</span>
+        </div>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL / LIENZO Y FICHA DE CONCEPTOS -->
+    <main class="flex-1 flex flex-col h-auto lg:h-screen overflow-hidden">
+        
+        <!-- Header Superior -->
+        <header class="bg-slate-900/80 backdrop-blur border-b border-slate-800 px-6 py-3 flex justify-between items-center z-10">
+            <div class="flex items-center space-x-3">
+                <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 flex items-center gap-1.5">
+                    <i class="fa-solid fa-shield-halved text-[10px]"></i>
+                    ODS 14: Conservar Océanos y Mares
+                </span>
+            </div>
+            <div class="text-xs text-slate-400 font-mono hidden md:block">
+                <i class="fa-solid fa-hand-pointer mr-1 text-cyan-400"></i>
+                Toca o arrastra sobre el lienzo para generar corrientes
+            </div>
+        </header>
+
+        <!-- Contenedor del Canvas -->
+        <div id="canvas-container" class="flex-1 bg-black relative flex items-center justify-center overflow-hidden min-h-[400px]">
+            <!-- p5.js inyecta el lienzo aquí -->
+        </div>
+
+        <!-- Ficha Técnica Pedagógica -->
+        <footer class="bg-slate-900 border-t border-slate-800 p-4 text-xs text-slate-300 grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <div class="bg-slate-950/40 p-3 rounded-lg border border-slate-800/80">
+                <div class="text-cyan-400 font-semibold mb-1 flex items-center">
+                    <i class="fa-solid fa-code text-xs mr-2"></i>
+                    <span>Temario de Programación I</span>
+                </div>
+                <p id="info-code" class="text-slate-400 text-[11px] leading-relaxed">
+                    Uso de Ruido Perlin 2D/3D (<code>p5.noise</code>) para simular un <strong>campo de vectores continuos</strong>. Mapeo del ángulo trigonométrico para controlar la dirección de las partículas sin discontinuidades abruptas.
+                </p>
+            </div>
+
+            <div class="bg-slate-950/40 p-3 rounded-lg border border-slate-800/80">
+                <div class="text-emerald-400 font-semibold mb-1 flex items-center">
+                    <i class="fa-solid fa-palette text-xs mr-2"></i>
+                    <span>Sintaxis de Artes Plásticas</span>
+                </div>
+                <p id="info-art" class="text-slate-400 text-[11px] leading-relaxed">
+                    <strong>Veladuras Digitales</strong>: La acumulación de transparencias de trazo simula acuarelas u óleos dinámicos. Representación del movimiento orgánico de la luz submarina y el dinamismo plástico.
+                </p>
+            </div>
+
+            <div class="bg-slate-950/40 p-3 rounded-lg border border-slate-800/80">
+                <div class="text-amber-400 font-semibold mb-1 flex items-center">
+                    <i class="fa-solid fa-earth-americas text-xs mr-2"></i>
+                    <span>Metáfora ODS 14 (ONU)</span>
+                </div>
+                <p id="info-ods" class="text-slate-400 text-[11px] leading-relaxed">
+                    La corriente marina genera vida visual. Al alterar el modo del ecosistema, la decoloración y la rigidez geométrica visibilizan el impacto de la acidificación y los microplásticos.
+                </p>
+            </div>
+
+        </footer>
+    </main>
+
+    <!-- CÓDIGO GENERATIVO P5.JS Y LÓGICA DE APLICACIÓN -->
+    <script>
+        // --- ESTADO GLOBAL ---
+        let particles = [];
+        let numParticles = 500;
+        let vectorSpeed = 2.5;
+        let noiseScale = 0.008;
+        let colorScheme = 'HSB_OCEAN';
+        let ecosystemMode = 'PRISTINE';
+        let zOff = 0; // Tercera dimensión de ruido para dinamismo continuo
+
+        // --- CLASE PARTÍCULA (Vectores, Física y Vida) ---
+        class MarineParticle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.pos = createVector(random(width), random(height));
+                this.vel = createVector(0, 0);
+                this.acc = createVector(0, 0);
+                this.prevPos = this.pos.copy();
+                this.life = random(150, 255);
+                this.maxSpeed = vectorSpeed;
+                this.size = random(0.8, 2.2);
+            }
+
+            update() {
+                this.prevPos = this.pos.copy();
+                this.vel.add(this.acc);
+                this.vel.limit(this.maxSpeed);
+                this.pos.add(this.vel);
+                this.acc.mult(0);
+                this.life -= (ecosystemMode === 'ACIDIFICATION') ? 1.2 : 0.6;
+
+                // Re-inicio si sale de límites o se agota su vida
+                if (this.pos.x > width || this.pos.x < 0 || this.pos.y > height || this.pos.y < 0 || this.life <= 0) {
+                    this.reset();
+                }
+            }
+
+            applyForce(force) {
+                this.acc.add(force);
+            }
+
+            draw() {
+                strokeWeight(this.size);
+                
+                let h, s, b, a;
+                
+                // Mapeo de color según modo y espacio seleccionado
+                if (colorScheme === 'HSB_OCEAN') {
+                    let nColor = noise(this.pos.x * 0.002, this.pos.y * 0.002);
+                    h = map(nColor, 0, 1, 170, 230);
+                    s = (ecosystemMode === 'ACIDIFICATION') ? 25 : 85;
+                    b = (ecosystemMode === 'ACIDIFICATION') ? 50 : 95;
+                } else if (colorScheme === 'HSB_BIOLUM') {
+                    let nColor = noise(this.pos.x * 0.003, this.pos.y * 0.003);
+                    h = map(nColor, 0, 1, 140, 280);
+                    s = 90;
+                    b = 100;
+                } else { // RGB HIGH CONTRAST
+                    h = (this.pos.x / width) * 360;
+                    s = 100;
+                    b = 90;
+                }
+
+                // Inyección de colores sintéticos en modo contaminación
+                if (ecosystemMode === 'PLASTIC' && random() < 0.08) {
+                    h = 340;
+                    s = 100;
+                    strokeWeight(this.size * 2);
+                }
+
+                a = map(this.life, 0, 255, 0, 0.5);
+                stroke(h, s, b, a);
+                line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
+            }
+        }
+
+        // --- SETUP P5.JS ---
+        function setup() {
+            const container = document.getElementById('canvas-container');
+            const canvas = createCanvas(container.clientWidth, container.clientHeight);
+            canvas.parent('canvas-container');
+            
+            colorMode(HSB, 360, 100, 100, 1.0);
+            background(230, 40, 6);
+            
+            initParticles();
+        }
+
+        // --- DRAW P5.JS ---
+        function draw() {
+            let bgAlpha = (ecosystemMode === 'PLASTIC') ? 0.12 : 0.06;
+            background(230, (ecosystemMode === 'ACIDIFICATION') ? 10 : 30, 5, bgAlpha);
+
+            // Obtener puntos de entrada de interacción (ratón o toques táctiles)
+            const interactionPoints = [];
+            const interactionMode = document.getElementById('interaction-mode').value;
+
+            if (interactionMode !== 'none') {
+                if (mouseIsPressed && mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+                    interactionPoints.push(createVector(mouseX, mouseY));
+                }
+                if (touches && touches.length > 0) {
+                    for (let t of touches) {
+                        if (t.x >= 0 && t.x <= width && t.y >= 0 && t.y <= height) {
+                            interactionPoints.push(createVector(t.x, t.y));
+                        }
+                    }
+                }
+            }
+
+            for (let p of particles) {
+                let angle = noise(p.pos.x * noiseScale, p.pos.y * noiseScale, zOff) * TWO_PI * 4;
+                let force = p5.Vector.fromAngle(angle);
+                
+                if (ecosystemMode === 'PLASTIC') {
+                    force.mult(0.4);
+                } else {
+                    force.mult(0.8);
+                }
+
+                // Aplicar fuerzas de interacción para cada punto táctil o de ratón activo
+                for (let inputVec of interactionPoints) {
+                    const dir = p5.Vector.sub(inputVec, p.pos);
+                    const distSq = dir.magSq();
+                    if (distSq < 40000 && distSq > 0) { // Radio de influencia de 200px
+                        dir.setMag(1.5);
+                        if (interactionMode === 'repel') dir.mult(-1);
+                        p.applyForce(dir);
+                    }
+                }
+
+                p.applyForce(force);
+                p.update();
+                p.draw();
+            }
+
+            zOff += 0.003;
+        }
+
+        // --- EVITAR SCROLL EN CELULARES MIENTRAS SE TOCA EL CANVAS ---
+        function touchStarted() {
+            if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+                return false;
+            }
+        }
+
+        function touchMoved() {
+            if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+                return false;
+            }
+        }
+
+        // --- FUNCIONES AUXILIARES ---
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < numParticles; i++) {
+                particles.push(new MarineParticle());
+            }
+        }
+
+        function randomizeArtwork() {
+            numParticles = floor(random(200, 1001));
+            vectorSpeed = random(1, 5).toFixed(1) * 1;
+            noiseScale = random(0.003, 0.020);
+
+            document.getElementById('slider-density').value = numParticles;
+            document.getElementById('slider-speed').value = vectorSpeed;
+            document.getElementById('slider-noise').value = noiseScale;
+            document.getElementById('val-density').textContent = numParticles;
+            document.getElementById('val-speed').textContent = vectorSpeed.toFixed(1);
+            document.getElementById('val-noise').textContent = noiseScale.toFixed(3);
+
+            particles.forEach(p => p.maxSpeed = vectorSpeed);
+            initParticles();
+        }
+
+        function setEcosystemMode(mode) {
+            ecosystemMode = mode;
+            
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('border-cyan-500/50', 'border-amber-500/50', 'border-rose-500/50', 'bg-slate-800');
+                btn.classList.add('border-slate-700', 'bg-slate-800/50');
+            });
+
+            const activeBtn = document.getElementById(`btn-${mode}`);
+            activeBtn.classList.remove('border-slate-700', 'bg-slate-800/50');
+            activeBtn.classList.add('bg-slate-800');
+
+            if (mode === 'PRISTINE') activeBtn.classList.add('border-cyan-500/50');
+            if (mode === 'ACIDIFICATION') activeBtn.classList.add('border-amber-500/50');
+            if (mode === 'PLASTIC') activeBtn.classList.add('border-rose-500/50');
+
+            resetCanvasArt();
+        }
+
+        function resetCanvasArt() {
+            background(230, 40, 6);
+            initParticles();
+        }
+
+        function downloadArtwork() {
+            saveCanvas(`ArtesPlasticas_ODS14_VidaSubmarina_${ecosystemMode}`, 'png');
+        }
+
+        // --- EVENTOS DE INTERFAZ ---
+        document.getElementById('slider-density').addEventListener('input', (e) => {
+            numParticles = parseInt(e.target.value);
+            document.getElementById('val-density').textContent = numParticles;
+            initParticles();
+        });
+
+        document.getElementById('slider-speed').addEventListener('input', (e) => {
+            vectorSpeed = parseFloat(e.target.value);
+            document.getElementById('val-speed').textContent = vectorSpeed.toFixed(1);
+            particles.forEach(p => p.maxSpeed = vectorSpeed);
+        });
+
+        document.getElementById('slider-noise').addEventListener('input', (e) => {
+            noiseScale = parseFloat(e.target.value);
+            document.getElementById('val-noise').textContent = noiseScale.toFixed(3);
+        });
+
+        document.getElementById('color-mode-select').addEventListener('change', (e) => {
+            colorScheme = e.target.value;
+        });
+
+        function windowResized() {
+            const container = document.getElementById('canvas-container');
+            resizeCanvas(container.clientWidth, container.clientHeight);
+            background(230, 40, 6);
+        }
+    </script>
+</body>
+</html>

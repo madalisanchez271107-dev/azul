@@ -1,0 +1,25 @@
+body {
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #020617;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+}
+
+/* Evita el desplazamiento y zoom por defecto en celulares sobre el canvas */
+#canvas-container canvas {
+    touch-action: none;
+}
